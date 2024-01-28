@@ -54,7 +54,7 @@ const ProductPerformance = () => {
     
                 // Log the new values
                 console.log('New id:', updatedCulture.idCategorieCulture);
-                console.log('New prix:', updatedCulture.prix);
+                console.log('New rendement:', updatedCulture.rendement);
     
                 return updatedCulture;
             }
@@ -62,6 +62,30 @@ const ProductPerformance = () => {
         });
     
         setCategorieCultures(updatedCategorieCultures);
+    };
+
+    const handleCheckClick = async (id) => {
+        // Find the edited culture
+        const editedCulture = categorieCultures.find(culture => culture.idCategorieCulture === id);
+
+        try {
+            // Make a PUT request to update the culture
+            const response = await fetch(`http://localhost:8080/update?id=${id}&nom=${editedCulture.nomCateCult}&rendement=${editedCulture.rendement}`, {
+                method: 'PUT',
+            });
+
+            if (response.ok) {
+                // If the update is successful, toggle the edit status
+                setEditStatus(prevEditStatus => ({
+                    ...prevEditStatus,
+                    [id]: false,
+                }));
+            } else {
+                console.error('Failed to update culture:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error during update:', error);
+        }
     };
     
     
@@ -144,19 +168,19 @@ const ProductPerformance = () => {
                                 <TableCell>
                                     {editStatus[culture.idCategorieCulture] ? (
                                         <EditableField
-                                            value={culture.prix}
-                                            onChange={(e) => handleInputChange(e, culture.idCategorieCulture, 'prix')}
+                                            value={culture.rendement}
+                                            onChange={(e) => handleInputChange(e, culture.idCategorieCulture, 'rendement')}
                                             id={culture.idCategorieCulture}
                                         />
                                     ) : (
                                         <Typography color="textSecondary" variant="subtitle2" fontWeight={400}>
-                                            {culture.prix}
+                                            {culture.rendement}
                                         </Typography>
                                     )}
                                 </TableCell>
                                 <TableCell>
                                     {editStatus[culture.idCategorieCulture] ? (
-                                        <IconCheck onClick={() => handleEditClick(culture.idCategorieCulture)} />
+                                        <IconCheck onClick={() => handleCheckClick(culture.idCategorieCulture)} />
                                     ) : (
                                         <IconEdit onClick={() => handleEditClick(culture.idCategorieCulture)} />
                                     )}

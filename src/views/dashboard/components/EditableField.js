@@ -17,7 +17,7 @@ const EditableField = ({ value, onChange, id }) => {
             borderLeftWidth:"0px",
             borderRightWidth:"0px",
             borderTopWidth:"0px",
-            width:"120px"
+            width:"100px"
         }}
         type="text"
         value={editedValue}
