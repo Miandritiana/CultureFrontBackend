@@ -6,7 +6,7 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    Link
+    Button
 } from '@mui/material';
 import DashboardCard from '../../../components/shared/DashboardCard';
 import { useState, useEffect } from 'react';
@@ -65,30 +65,91 @@ const ProductPerformance = () => {
     };
 
     const handleCheckClick = async (id) => {
-        // Find the edited culture
-        const editedCulture = categorieCultures.find(culture => culture.idCategorieCulture === id);
+        // Check if the culture is new or existing
+        const isNewCulture = id < 0; // Assuming negative IDs are temporary and not present on the server
 
         try {
-            // Make a PUT request to update the culture
-            const response = await fetch(`http://localhost:8080/update?id=${id}&nom=${editedCulture.nomCateCult}&rendement=${editedCulture.rendement}`, {
-                method: 'PUT',
-            });
+            if (isNewCulture) {
+                // Make a POST request to insert the new culture
+                const response = await fetch('http://localhost:8080/categoriecultures/insert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        nom: categorieCultures.find(culture => culture.idCategorieCulture === id).nomCateCult,
+                        rendement: categorieCultures.find(culture => culture.idCategorieCulture === id).rendement.toString(),
+                    }),
+                });
 
-            if (response.ok) {
-                // If the update is successful, toggle the edit status
-                setEditStatus(prevEditStatus => ({
-                    ...prevEditStatus,
-                    [id]: false,
-                }));
+                // if (response.ok) {
+                //     // Update the state to reflect the successful insert
+                //     // You may need to update the state based on the server response
+                //     setCategorieCultures(prevCategorieCultures => prevCategorieCultures.map(culture => {
+                //         if (culture.idCategorieCulture === id) {
+                //             return { ...culture, idCategorieCulture: /* new id from server */ };
+                //         }
+                //         return culture;
+                //     }));
+
+                //     // Set the edit status for the new culture to false
+                //     setEditStatus(prevEditStatus => ({
+                //         ...prevEditStatus,
+                //         [id]: false,
+                //     }));
+                // } else {
+                //     console.error('Failed to insert culture:', response.statusText);
+                // }
             } else {
-                console.error('Failed to update culture:', response.statusText);
+                // Handle the logic for updating an existing culture (similar to your existing handleCheckClick logic)
+                // ...
             }
         } catch (error) {
-            console.error('Error during update:', error);
+            console.error('Error during update/insert:', error);
         }
     };
+
     
-    
+    const handleDeleteClick = async (id, nomCateCult) => {
+        // Display a confirmation dialog
+        const isConfirmed = window.confirm(`Are you sure to delete "${nomCateCult}"?`);
+
+        if (isConfirmed) {
+            try {
+                // Make a DELETE request to delete the culture
+                const response = await fetch(`http://localhost:8080/categoriecultures/delete?id=${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    // If the delete is successful, update the state to remove the deleted culture
+                    setCategorieCultures(prevCategorieCultures => prevCategorieCultures.filter(culture => culture.idCategorieCulture !== id));
+                } else {
+                    console.error('Failed to delete culture:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Error during delete:', error);
+            }
+        }
+    };
+
+    const handleAddClick = () => {
+        // Create a new culture with default values or fetch from server if needed
+        const newCulture = {
+            idCategorieCulture: Date.now(),
+            nomCateCult: "",
+            rendement: 0,
+        };
+
+        // Update the state to add the new culture
+        setCategorieCultures(prevCategorieCultures => [...prevCategorieCultures, newCulture]);
+
+        // Set the edit status for the new culture to true so fields are editable
+        setEditStatus(prevEditStatus => ({
+            ...prevEditStatus,
+            [newCulture.idCategorieCulture]: true,
+        }));
+    };
 
     return (
 
@@ -186,11 +247,14 @@ const ProductPerformance = () => {
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <IconTrash />
+                                    <IconTrash onClick={() => handleDeleteClick(culture.idCategorieCulture, culture.nomCateCult)} />
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
+                    <Button variant="contained" color="primary" onClick={handleAddClick}>
+                        New Categorie Culture
+                    </Button>
                 </Table>
             </Box>
         </DashboardCard>
