@@ -3,7 +3,6 @@ import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge, Button } from '
 import PropTypes from 'prop-types';
 
 // components
-import Profile from './Profile';
 import { IconBellRinging, IconMenu } from '@tabler/icons';
 
 const Header = (props) => {
@@ -29,19 +28,6 @@ const Header = (props) => {
   return (
     <AppBarStyled position="sticky" color="default">
       <ToolbarStyled>
-        <IconButton
-          color="inherit"
-          aria-label="menu"
-          onClick={props.toggleMobileSidebar}
-          sx={{
-            display: {
-              lg: "none",
-              xs: "inline",
-            },
-          }}
-        >
-          <IconMenu width="20" height="20" />
-        </IconButton>
 
 
         <IconButton
@@ -62,12 +48,6 @@ const Header = (props) => {
 
         </IconButton>
         <Box flexGrow={1} />
-        <Stack spacing={1} direction="row" alignItems="center">
-          <Button variant="contained" color="primary"  target="_blank" href="https://adminmart.com/product/modernize-react-mui-dashboard-template/">
-            Upgrade to Pro
-          </Button>
-          <Profile />
-        </Stack>
       </ToolbarStyled>
     </AppBarStyled>
   );

@@ -10,11 +10,31 @@ import {
   TimelineContent,
   timelineOppositeContentClasses,
 } from '@mui/lab';
+import Btn from './Btn';
 import { Link, Typography } from '@mui/material';
+import { useState, useEffect } from 'react';
 
 const RecentTransactions = () => {
+
+  const [terrainNonValide, setTerrainNonValide] = useState([]);
+
+  useEffect(() => {
+      // Make an HTTP GET request to your Spring Boot endpoint
+      fetch('http://localhost:8080/terrains/avalider')
+          .then(response => response.json())
+          .then(data => {
+              // Update the state with the response data
+              setTerrainNonValide(data);
+              console.log(data);
+          })
+          .catch(error => {
+              // Handle errors
+              console.error('Misy.....Error during fetch(terrain non valide):', error);
+          });
+  }, []);
+  
   return (
-    <DashboardCard title="Recent Transactions">
+    <DashboardCard title="Valider creation terrain">
       <>
         <Timeline
           className="theme-timeline"
@@ -34,65 +54,17 @@ const RecentTransactions = () => {
             },
           }}
         >
-          <TimelineItem>
-            <TimelineOppositeContent>09:30 am</TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineDot color="primary" variant="outlined" />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>Payment received from John Doe of $385.90</TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineOppositeContent>10:00 am</TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineDot color="secondary" variant="outlined" />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>
-              <Typography fontWeight="600">New sale recorded</Typography>{' '}
-              <Link href="/" underline="none">
-                #ML-3467
-              </Link>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineOppositeContent>12:00 am</TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineDot color="success" variant="outlined" />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>Payment was made of $64.95 to Michael</TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineOppositeContent>09:30 am</TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineDot color="warning" variant="outlined" />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>
-              <Typography fontWeight="600">New sale recorded</Typography>{' '}
-              <Link href="/" underline="none">
-                #ML-3467
-              </Link>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineOppositeContent>09:30 am</TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineDot color="error" variant="outlined" />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>
-              <Typography fontWeight="600">New arrival recorded</Typography>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineOppositeContent>12:00 am</TimelineOppositeContent>
-            <TimelineSeparator>
-              <TimelineDot color="success" variant="outlined" />
-            </TimelineSeparator>
-            <TimelineContent>Payment Received</TimelineContent>
-          </TimelineItem>
+          {Array.isArray(terrainNonValide) && terrainNonValide.map((t) => (
+            <TimelineItem>
+              <TimelineOppositeContent><Btn /></TimelineOppositeContent>
+              <TimelineSeparator>
+                <TimelineDot color="warning" variant="outlined" />
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineContent><Typography fontWeight="600">{t.nomUser}</Typography> a demande la creation du "{t.description}"<Typography fontWeight="400">{t.geolocalisation}</Typography></TimelineContent>
+            </TimelineItem>
+          ))}
+          <TimelineItem></TimelineItem>
         </Timeline>
       </>
     </DashboardCard>

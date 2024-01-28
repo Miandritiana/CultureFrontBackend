@@ -15,6 +15,6 @@ function App() {
 
     </ThemeProvider>
   );
-}Register 
+}
 
 export default App;

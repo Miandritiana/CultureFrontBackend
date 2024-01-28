@@ -6,54 +6,69 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    Chip
+    Link
 } from '@mui/material';
 import DashboardCard from '../../../components/shared/DashboardCard';
-
-const products = [
-    {
-        id: "1",
-        name: "Sunil Joshi",
-        post: "Web Designer",
-        pname: "Elite Admin",
-        priority: "Low",
-        pbg: "primary.main",
-        budget: "3.9",
-    },
-    {
-        id: "2",
-        name: "Andrew McDownland",
-        post: "Project Manager",
-        pname: "Real Homes WP Theme",
-        priority: "Medium",
-        pbg: "secondary.main",
-        budget: "24.5",
-    },
-    {
-        id: "3",
-        name: "Christopher Jamil",
-        post: "Project Manager",
-        pname: "MedicalPro WP Theme",
-        priority: "High",
-        pbg: "error.main",
-        budget: "12.8",
-    },
-    {
-        id: "4",
-        name: "Nirav Joshi",
-        post: "Frontend Engineer",
-        pname: "Hosting Press HTML",
-        priority: "Critical",
-        pbg: "success.main",
-        budget: "2.4",
-    },
-];
-
+import { useState, useEffect } from 'react';
+import {
+    IconTrash, IconEdit, IconCheck
+  } from '@tabler/icons';
+import EditableField from './EditableField';
 
 const ProductPerformance = () => {
+
+    const [categorieCultures, setCategorieCultures] = useState([]);
+    const [editStatus, setEditStatus] = useState({});
+
+    useEffect(() => {
+      // Make an HTTP GET request to your Spring Boot endpoint
+      fetch('http://localhost:8080/categoriecultures/')
+        .then(response => response.json())
+        .then(data => {
+          // Update the state with the response data
+          setCategorieCultures(data);
+          setEditStatus(Object.fromEntries(data.map(culture => [culture.idCategorieCulture, false])));
+          console.log(data);
+        })
+        .catch(error => {
+          // Handle errors
+          console.error('Misy.....Error during fetch(categori culture):', error);
+        });
+    }, []);
+
+    const handleEditClick = (id) => {
+        // Toggle the edit status for the clicked row
+        setEditStatus(prevEditStatus => ({
+            ...prevEditStatus,
+            [id]: !prevEditStatus[id],
+        }));
+    };
+
+    const handleInputChange = (e, id, field) => {
+        const updatedCategorieCultures = categorieCultures.map(culture => {
+            if (culture.idCategorieCulture === id) {
+                const updatedCulture = {
+                    ...culture,
+                    [field]: e.target.value,
+                };
+    
+                // Log the new values
+                console.log('New id:', updatedCulture.idCategorieCulture);
+                console.log('New prix:', updatedCulture.prix);
+    
+                return updatedCulture;
+            }
+            return culture;
+        });
+    
+        setCategorieCultures(updatedCategorieCultures);
+    };
+    
+    
+
     return (
 
-        <DashboardCard title="Product Performance">
+        <DashboardCard title="Categorie de culture">
             <Box sx={{ overflow: 'auto', width: { xs: '280px', sm: 'auto' } }}>
                 <Table
                     aria-label="simple table"
@@ -66,34 +81,34 @@ const ProductPerformance = () => {
                         <TableRow>
                             <TableCell>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    Id
+                                    IdCulture
                                 </Typography>
                             </TableCell>
                             <TableCell>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    Assigned
+                                    Nom culture
                                 </Typography>
                             </TableCell>
                             <TableCell>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    Name
+                                    Prix
                                 </Typography>
                             </TableCell>
                             <TableCell>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    Priority
+                                    Modify
                                 </Typography>
                             </TableCell>
-                            <TableCell align="right">
+                            <TableCell>
                                 <Typography variant="subtitle2" fontWeight={600}>
-                                    Budget
+                                    Delete
                                 </Typography>
                             </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.map((product) => (
-                            <TableRow key={product.name}>
+                        {categorieCultures.map((culture) => (
+                            <TableRow key={culture.idCategorieCulture}>
                                 <TableCell>
                                     <Typography
                                         sx={{
@@ -101,7 +116,7 @@ const ProductPerformance = () => {
                                             fontWeight: "500",
                                         }}
                                     >
-                                        {product.id}
+                                        {culture.idCategorieCulture}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>
@@ -112,38 +127,42 @@ const ProductPerformance = () => {
                                         }}
                                     >
                                         <Box>
-                                            <Typography variant="subtitle2" fontWeight={600}>
-                                                {product.name}
-                                            </Typography>
-                                            <Typography
-                                                color="textSecondary"
-                                                sx={{
-                                                    fontSize: "13px",
-                                                }}
-                                            >
-                                                {product.post}
-                                            </Typography>
+                                            {editStatus[culture.idCategorieCulture] ? (  
+                                                <EditableField
+                                                    value={culture.nomCateCult}
+                                                    onChange={(e) => handleInputChange(e, culture.idCategorieCulture, 'nomCateCult')}
+                                                    id={culture.idCategorieCulture}
+                                                />
+                                            ) : (
+                                                <Typography variant="subtitle2" fontWeight={600}>
+                                                    {culture.nomCateCult}
+                                                </Typography>
+                                            )}
                                         </Box>
                                     </Box>
                                 </TableCell>
                                 <TableCell>
-                                    <Typography color="textSecondary" variant="subtitle2" fontWeight={400}>
-                                        {product.pname}
-                                    </Typography>
+                                    {editStatus[culture.idCategorieCulture] ? (
+                                        <EditableField
+                                            value={culture.prix}
+                                            onChange={(e) => handleInputChange(e, culture.idCategorieCulture, 'prix')}
+                                            id={culture.idCategorieCulture}
+                                        />
+                                    ) : (
+                                        <Typography color="textSecondary" variant="subtitle2" fontWeight={400}>
+                                            {culture.prix}
+                                        </Typography>
+                                    )}
                                 </TableCell>
                                 <TableCell>
-                                    <Chip
-                                        sx={{
-                                            px: "4px",
-                                            backgroundColor: product.pbg,
-                                            color: "#fff",
-                                        }}
-                                        size="small"
-                                        label={product.priority}
-                                    ></Chip>
+                                    {editStatus[culture.idCategorieCulture] ? (
+                                        <IconCheck onClick={() => handleEditClick(culture.idCategorieCulture)} />
+                                    ) : (
+                                        <IconEdit onClick={() => handleEditClick(culture.idCategorieCulture)} />
+                                    )}
                                 </TableCell>
-                                <TableCell align="right">
-                                    <Typography variant="h6">${product.budget}k</Typography>
+                                <TableCell>
+                                    <IconTrash />
                                 </TableCell>
                             </TableRow>
                         ))}
