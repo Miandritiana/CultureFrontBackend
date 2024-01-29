@@ -11,7 +11,7 @@ import {
   timelineOppositeContentClasses,
 } from '@mui/lab';
 import Btn from './Btn';
-import { Link, Typography, Button, Dialog, DialogTitle, DialogActions } from '@mui/material';
+import { Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 
 const RecentTransactions = () => {
