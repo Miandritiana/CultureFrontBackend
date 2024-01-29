@@ -53,7 +53,7 @@ const RecentTransactions = () => {
         requestBody.append('idTerrain', idTerrain);
 
         // Make a GET request to validate the terrain
-        const response = await fetch('http://localhost:8080/terrains/valider', {
+        const response = await fetch('https://culturebackoffice-production.up.railway.app/terrains/valider', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
