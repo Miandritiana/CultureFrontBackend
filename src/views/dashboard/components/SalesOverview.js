@@ -27,7 +27,7 @@ const SalesOverview = () => {
 
     useEffect(() => {
         // Fetch categories
-        fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/')
+        fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/categorieculture')
             .then(response => response.json())
             .then(data => {
                 setCategories(data);

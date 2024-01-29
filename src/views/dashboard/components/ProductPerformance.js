@@ -22,7 +22,7 @@ const ProductPerformance = () => {
 
     useEffect(() => {
       // Make an HTTP GET request to your Spring Boot endpoint
-      fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/')
+      fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/categorieculture')
         .then(response => response.json())
         .then(data => {
           // Update the state with the response data
@@ -72,7 +72,7 @@ const ProductPerformance = () => {
         try {
             if (isNewCulture) {
                 // Make a POST request to insert the new culture
-                const response = await fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/insert', {
+                const response = await fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/categorieculture', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -127,7 +127,7 @@ const ProductPerformance = () => {
                 const rendement = cultureToUpdate.rendement;
 
                 // Make a PUT request to update the culture
-                const response = await fetch(`https://culturebackoffice-production.up.railway.app/categoriecultures/update?id=${id}&nom=${nom}&rendement=${rendement}`, {
+                const response = await fetch(`https://culturebackoffice-production.up.railway.app/categoriecultures/categorieculture?id=${id}&nom=${nom}&rendement=${rendement}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -171,7 +171,7 @@ const ProductPerformance = () => {
         if (isConfirmed) {
             try {
                 // Make a DELETE request to delete the culture
-                const response = await fetch(`https://culturebackoffice-production.up.railway.app/categoriecultures/delete?id=${id}`, {
+                const response = await fetch(`https://culturebackoffice-production.up.railway.app/categoriecultures/categorieculture?id=${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json', // Set the content type if needed

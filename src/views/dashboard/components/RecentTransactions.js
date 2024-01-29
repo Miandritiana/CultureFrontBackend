@@ -53,15 +53,11 @@ const RecentTransactions = () => {
         requestBody.append('idTerrain', idTerrain);
 
         // Make a GET request to validate the terrain
-        // const response = await fetch(`http://localhost:8080/terrains/valider?idTerrain=${idTerrain}&idUser=${idUser}`);
         const response = await fetch('http://localhost:8080/terrains/valider', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          // body: new URLSearchParams({
-          //   idTerrain: idTerrain,
-          //   idUser: idUser,
           body: requestBody.toString(),
         });
   
