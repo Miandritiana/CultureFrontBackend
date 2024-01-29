@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Btn = () => {
+const Btn = ({ onClick }) => {
     return (
         <button
             style={{
@@ -14,6 +14,8 @@ const Btn = () => {
             transition: "background 0.3s, color 0.3s",
             cursor: "pointer",
             }}
+            // Apply styles on button click
+            onClick={onClick}
             // Apply hover styles
             onMouseOver={(e) => {
               e.currentTarget.style.background = "#3c7d3c";

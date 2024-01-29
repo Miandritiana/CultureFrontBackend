@@ -15,11 +15,6 @@ const SalesOverview = () => {
         setMonth(event.target.value);
     };
 
-    // chart color
-    const theme = useTheme();
-    const primary = theme.palette.primary.main;
-    const secondary = theme.palette.secondary.main;
-
     // chart
     const [chartData, setChartData] = useState({
         options: {
@@ -32,7 +27,7 @@ const SalesOverview = () => {
 
     useEffect(() => {
         // Fetch categories
-        fetch('http://localhost:8080/categoriecultures/')
+        fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/')
             .then(response => response.json())
             .then(data => {
                 setCategories(data);
@@ -42,7 +37,7 @@ const SalesOverview = () => {
             });
 
         // Fetch chart data
-        fetch('http://localhost:8080/categoriecultures/statistiques')
+        fetch('https://culturebackoffice-production.up.railway.app/categoriecultures/statistiques')
             .then(response => response.json())
             .then(data => {
                 // Update the state with the response data

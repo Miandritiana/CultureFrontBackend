@@ -17,12 +17,11 @@ import { useState, useEffect } from 'react';
 const RecentTransactions = () => {
 
   const [terrainNonValide, setTerrainNonValide] = useState([]);
-  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
   const [terrainToValidate, setTerrainToValidate] = useState(null);
 
   useEffect(() => {
       // Make an HTTP GET request to your Spring Boot endpoint
-      fetch('http://localhost:8080/terrains/avalider')
+      fetch('https://culturebackoffice-production.up.railway.app/terrains/avalider')
           .then(response => response.json())
           .then(data => {
               // Update the state with the response data
@@ -36,49 +35,61 @@ const RecentTransactions = () => {
   }, []);
 
   const handleBtnClick = (terrain) => {
-    setTerrainToValidate(terrain);
-    setConfirmationDialogOpen(true);
+    console.log("btn clicked");
+    // Display a confirmation dialog
+    const isConfirmed = window.confirm(`Are you sure to validate the terrain?`);
+    if (isConfirmed) {
+      // Directly call the confirmation logic if confirmed
+      handleConfirmation(terrain.idTerrain);
+    }
   };
 
-  const handleConfirmation = async () => {
-    if (terrainToValidate) {
+  const handleConfirmation = async (idTerrain, idUser) => {
+    
+    if (idTerrain) {
       try {
-        // Make a POST request to validate the terrain
-        const response = await fetch('http://localhost:8080/valider', {
-          method: 'POST',
+
+        const requestBody = new URLSearchParams();
+        requestBody.append('idTerrain', idTerrain);
+
+        // Make a GET request to validate the terrain
+        // const response = await fetch(`http://localhost:8080/terrains/valider?idTerrain=${idTerrain}&idUser=${idUser}`);
+        const response = await fetch('http://localhost:8080/terrains/valider', {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: new URLSearchParams({
-            idTerrain: terrainToValidate.idTerrain,
-            idParcelle: terrainToValidate.idParcelle,
-            idUser: terrainToValidate.idUser,
-          }),
+          // body: new URLSearchParams({
+          //   idTerrain: idTerrain,
+          //   idUser: idUser,
+          body: requestBody.toString(),
         });
-
+  
         if (response.ok) {
           // Update the state to remove the validated terrain
-          setTerrainNonValide(prevTerrainNonValide =>
-            prevTerrainNonValide.filter(t => t.idTerrain !== terrainToValidate.idTerrain)
+          setTerrainNonValide((prevTerrainNonValide) =>
+            prevTerrainNonValide.filter((t) => t.idTerrain !== idTerrain)
           );
+  
+          // Display an alert message
+          alert('Terrain validated successfully.');
         } else {
           console.error('Failed to validate terrain:', response.statusText);
+          // Handle error scenarios or provide user feedback
+          alert('Failed to validate terrain. Please try again.');
         }
       } catch (error) {
         console.error('Error during terrain validation:', error);
+        // Handle error scenarios or provide user feedback
+        alert('Error during terrain validation. Please try again.');
       } finally {
         // Close the confirmation dialog
-        setConfirmationDialogOpen(false);
+        // setConfirmationDialogOpen(false);
         setTerrainToValidate(null);
       }
     }
   };
 
-  const handleCancellation = () => {
-    // Close the confirmation dialog
-    setConfirmationDialogOpen(false);
-    setTerrainToValidate(null);
-  };
   
   return (
     <DashboardCard title="Valider creation terrain">
@@ -113,13 +124,6 @@ const RecentTransactions = () => {
           ))}
           <TimelineItem></TimelineItem>
         </Timeline>
-        <Dialog open={confirmationDialogOpen} onClose={handleCancellation}>
-          <DialogTitle>Are you sure to validate?</DialogTitle>
-          <DialogActions>
-            <Button onClick={handleCancellation}>Cancel</Button>
-            <Button onClick={handleConfirmation}>OK</Button>
-          </DialogActions>
-        </Dialog>
       </>
     </DashboardCard>
   );

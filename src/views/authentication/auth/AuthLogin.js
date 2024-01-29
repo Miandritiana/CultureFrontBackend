@@ -20,7 +20,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
   
     const handleLogin = () => {
         // Make an HTTP POST request to your Spring Boot login endpoint
-        fetch(`http://localhost:8080/users/checkLogin?username=${username}&password=${password}`)
+        fetch(`https://culturebackoffice-production.up.railway.app/users/checkLogin?username=${username}&password=${password}`)
             .then(response => {
                 if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -58,12 +58,12 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
                 <Box>
                     <Typography variant="subtitle1"
                         fontWeight={600} component="label" htmlFor='username' mb="5px">Username</Typography>
-                    <CustomTextField id="username" variant="outlined" fullWidth value={username} onChange={(e) => setUsername(e.target.value)}/>
+                    <CustomTextField id="username" variant="outlined" fullWidth value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Admin"/>
                 </Box>
                 <Box mt="25px">
                     <Typography variant="subtitle1"
                         fontWeight={600} component="label" htmlFor='password' mb="5px" >Password</Typography>
-                    <CustomTextField id="password" type="password" variant="outlined" fullWidth value={password} onChange={(e) => setPassword(e.target.value)}/>
+                    <CustomTextField id="password" type="password" variant="outlined" fullWidth value={password} onChange={(e) => setPassword(e.target.value)} placeholder="123"/>
                 </Box>
                 <Stack justifyContent="space-between" direction="row" alignItems="center" my={2}>
                     <FormGroup>
