@@ -66,6 +66,7 @@ const ProductPerformance = () => {
 
     const handleCheckClick = async (id) => {
         // Check if the culture is new or existing
+        console.log("iconcheck clicke......");
         const isNewCulture = id < 0; // Assuming negative IDs are temporary and not present on the server
 
         try {
@@ -82,27 +83,80 @@ const ProductPerformance = () => {
                     }),
                 });
 
-                // if (response.ok) {
-                //     // Update the state to reflect the successful insert
-                //     // You may need to update the state based on the server response
-                //     setCategorieCultures(prevCategorieCultures => prevCategorieCultures.map(culture => {
-                //         if (culture.idCategorieCulture === id) {
-                //             return { ...culture, idCategorieCulture: /* new id from server */ };
-                //         }
-                //         return culture;
-                //     }));
+                if (response.ok) {
+                    // Update the state to reflect the successful insert
+                    // You may need to update the state based on the server response
+                    setCategorieCultures(prevCategorieCultures => prevCategorieCultures.map(culture => {
+                        if (culture.idCategorieCulture === id) {
+                            const maxId = Math.max(...prevCategorieCultures.map(c => c.idCategorieCulture));
+                            const newId = maxId + 1;
+                    
+                            return { ...culture, idCategorieCulture: newId };
+                        }
+                        return culture;
+                    }));
 
-                //     // Set the edit status for the new culture to false
-                //     setEditStatus(prevEditStatus => ({
-                //         ...prevEditStatus,
-                //         [id]: false,
-                //     }));
-                // } else {
-                //     console.error('Failed to insert culture:', response.statusText);
-                // }
+                    // Set the edit status for the new culture to false
+                    setEditStatus(prevEditStatus => ({
+                        ...prevEditStatus,
+                        [id]: false,
+                    }));
+                } else {
+                    console.error('Failed to insert culture:', response.statusText);
+                }
             } else {
-                // Handle the logic for updating an existing culture (similar to your existing handleCheckClick logic)
-                // ...
+
+                // Find the culture to update
+                const cultureToUpdate = categorieCultures.find(culture => culture.idCategorieCulture === id);
+
+                // Get the edited fields for the culture
+                const editedFields = Object.keys(editStatus).filter(fieldName => editStatus[fieldName]);
+                console.log(editedFields);
+
+                // Prepare the request body with only the edited fields
+                const requestBody = new URLSearchParams();
+                editedFields.forEach(fieldName => {
+                    const fieldValue = cultureToUpdate[fieldName];
+                    if (fieldValue !== undefined && fieldValue !== null) {
+                        requestBody.append(fieldName, fieldValue.toString());
+                    }
+                });
+
+                // Get the values of nom and rendement
+                const nom = cultureToUpdate.nomCateCult;
+                const rendement = cultureToUpdate.rendement;
+
+                // Make a PUT request to update the culture
+                const response = await fetch(`http://localhost:8080/categoriecultures/update?id=${id}&nom=${nom}&rendement=${rendement}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: requestBody.toString(),  // Convert the URLSearchParams to a string
+                });
+
+                if (response.ok) {
+                    // Update the state to reflect the successful update
+                    // (Assuming your server doesn't return updated data, otherwise, update accordingly)
+                    // You may need to update the state based on the server response
+                    setCategorieCultures(prevCategorieCultures => prevCategorieCultures.map(culture => {
+                        if (culture.idCategorieCulture === id) {
+                            // Update only the edited fields
+                            editedFields.forEach(fieldName => {
+                                culture[fieldName] = cultureToUpdate[fieldName];
+                            });
+                        }
+                        return culture;
+                    }));
+
+                    // Set the edit status for the updated culture to false
+                    setEditStatus(prevEditStatus => ({
+                        ...prevEditStatus,
+                        [id]: false,
+                    }));
+                } else {
+                    console.error('Failed to update culture:', response.statusText);
+                }
             }
         } catch (error) {
             console.error('Error during update/insert:', error);
@@ -113,30 +167,37 @@ const ProductPerformance = () => {
     const handleDeleteClick = async (id, nomCateCult) => {
         // Display a confirmation dialog
         const isConfirmed = window.confirm(`Are you sure to delete "${nomCateCult}"?`);
-
+    
         if (isConfirmed) {
             try {
                 // Make a DELETE request to delete the culture
                 const response = await fetch(`http://localhost:8080/categoriecultures/delete?id=${id}`, {
                     method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json', // Set the content type if needed
+                        // Add other headers as needed
+                    },
                 });
-
+    
                 if (response.ok) {
                     // If the delete is successful, update the state to remove the deleted culture
                     setCategorieCultures(prevCategorieCultures => prevCategorieCultures.filter(culture => culture.idCategorieCulture !== id));
                 } else {
                     console.error('Failed to delete culture:', response.statusText);
+                    // Handle the error case here if needed
                 }
             } catch (error) {
                 console.error('Error during delete:', error);
+                // Handle the error case here if needed
             }
         }
     };
+    
 
     const handleAddClick = () => {
         // Create a new culture with default values or fetch from server if needed
         const newCulture = {
-            idCategorieCulture: Date.now(),
+            idCategorieCulture: -Date.now(),
             nomCateCult: "",
             rendement: 0,
         };
